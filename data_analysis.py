@@ -224,13 +224,23 @@ for i, item in enumerate(limited_top10_support):
 # transform the data into entries of transactions with a list of items bought in the transaction i.e. transactions = [('eggs', 'bacon', 'soup'),('eggs', 'bacon', 'apple'),('soup', 'bacon', 'banana')]
 transactions = data.groupby('TransactionNo')['Items'].apply(list)
 
-# import the apriori algorithm from efficient_apriori
-from efficient_apriori import apriori
+from mlxtend.frequent_patterns import fpgrowth
+from mlxtend.preprocessing import TransactionEncoder
+import pandas as pd
 
-# find the frequent itemsets and rules with a minimum support of 0.01 and a minimum confidence of 0.5
-itemsets, rules = apriori(transactions, min_support=0.01, min_confidence=0.5)
+# Convert dataset to a one-hot encoded format
+te = TransactionEncoder()
+te_ary = te.fit(transactions).transform(transactions)
+df = pd.DataFrame(te_ary, columns=te.columns_)
 
-print(rules)
+# Use FP-growth to find frequent itemsets
+frequent_itemsets = fpgrowth(df, min_support=0.01, use_colnames=True)
+
+# filter out itemsets that have only 1 item
+frequent_itemsets = frequent_itemsets[frequent_itemsets['itemsets'].apply(lambda x: len(x) > 1)]
+
+
+print(frequent_itemsets)
 
 
 
