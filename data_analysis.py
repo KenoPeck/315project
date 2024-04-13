@@ -221,6 +221,17 @@ for i, item in enumerate(limited_top10_support):
     if i < 10:
         plt.show()
 
+# transform the data into entries of transactions with a list of items bought in the transaction i.e. transactions = [('eggs', 'bacon', 'soup'),('eggs', 'bacon', 'apple'),('soup', 'bacon', 'banana')]
+transactions = data.groupby('TransactionNo')['Items'].apply(list)
+
+# import the apriori algorithm from efficient_apriori
+from efficient_apriori import apriori
+
+# find the frequent itemsets and rules with a minimum support of 0.01 and a minimum confidence of 0.5
+itemsets, rules = apriori(transactions, min_support=0.01, min_confidence=0.5)
+
+print(rules)
+
 
 
 
